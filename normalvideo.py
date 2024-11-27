@@ -2,6 +2,12 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 import cvzone
+import os
+import torch
+
+# Load YOLO model
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def RGB(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE:
@@ -11,14 +17,26 @@ def RGB(event, x, y, flags, param):
 cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
 # Load the YOLOv8 model
-model = YOLO("yolo11s.pt")
+model = YOLO("yolo11x.pt").to(device)
+# model = YOLO("yolov8n.pt")
 names = model.model.names
 # Open the video file (use video file or webcam, here using webcam)
-cap = cv2.VideoCapture('susp1.mp4')
+# cap = cv2.VideoCapture('susp1.mp4')
+cap = cv2.VideoCapture('D:/activity_surveillance/action_class/no_note_giving/no-action-93.mp4')
+
+# cap = cv2.VideoCapture('object_blurring_output_2.mp4')
+# Get the original video properties (frame width, height, fps)
+frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+fps = int(cap.get(cv2.CAP_PROP_FPS))
+
+print(f"Original frame size: {frame_width}x{frame_height}, FPS: {fps}")
+
+
 w, h, fps = (int(cap.get(x)) for x in (cv2.CAP_PROP_FRAME_WIDTH, cv2.CAP_PROP_FRAME_HEIGHT, cv2.CAP_PROP_FPS))
 
 blur_ratio = 50
-video_writer = cv2.VideoWriter("object_blurring_output.mp4", cv2.VideoWriter_fourcc(*"mp4v"), fps, (1020, 600))
+video_writer = cv2.VideoWriter("D:/activity_surveillance/Normal_video/no-action-93.mp4", cv2.VideoWriter_fourcc(*"mp4v"), fps, (1020, 600))
 
 # Variable to store the user-selected track_id for blurring
 selected_track_id = None
@@ -30,7 +48,8 @@ while True:
     if not ret:
         break
     count += 1
-    if count % 3 != 0:
+    print("COUNT:", count)
+    if count % 15 != 0:
         continue
 
     # Resize both frames for display
@@ -38,7 +57,8 @@ while True:
     frame1 = frame.copy()  # Copy of the original frame for observation
 
     # Run YOLOv8 tracking on the frame, persisting tracks between frames
-    results = model.track(frame, persist=True, classes=0)
+    # results = model.track(frame, persist=True, classes=0)
+    results = model.track(frame, persist=True, classes=0, device=device)
 
     # Check if there are any boxes in the results
     if results[0].boxes is not None and results[0].boxes.id is not None:
@@ -68,7 +88,8 @@ while True:
                 cvzone.putTextRect(frame, f'{c}', (x1, y1), 1, 1)
                 
 
-    # Write the processed frame to the video writer
+    # Write the processed frame to the video 
+    print("******************frames to write:*************************",frame)
     video_writer.write(frame)
 
     # Display both frames: 'RGB' for processed frame and 'FRAME' for observation frame
