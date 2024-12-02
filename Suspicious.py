@@ -4,24 +4,33 @@ from ultralytics import YOLO
 import pandas as pd
 
 # Load your YOLO model
-model = YOLO("yolo11s-pose.pt")
+model = YOLO("yolo11x-pose.pt")
 
 # Video path
-cap = cv2.VideoCapture('suspicious.mp4')
+cap = cv2.VideoCapture("D:/activity_surveillance/Suspecious_Video/note-giving-128.mp4")
+print(f"cap is {cap}")
+
+if not cap.isOpened():
+    print("Error: Unable to open video file.")
+    exit()
+
 
 # Get video properties
 frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+print(f"Frames: {frames}")
 fps = cap.get(cv2.CAP_PROP_FPS)
+print(f"FPS: {fps}")
 seconds = round(frames / fps)
+print(f"Seconds: {seconds}")
 
-frame_total = 2000
+frame_total = 70
 i = 0
-a = 1543 # Start from 848 forcefully
+a = 1261
 
 all_data = []
 
 # Define output path for cropped images
-output_path_dir = r'C:\Users\freed\Downloads\yolo11_suspicious_activity-main\yolo11_suspicious_activity-main\images1'
+output_path_dir = r'D:\activity_surveillance\dataset_path\Suspicious'
 
 while cap.isOpened():
     # Set the position in milliseconds
@@ -32,7 +41,7 @@ while cap.isOpened():
         break
 
     # Save full frame image
-    pa = r'C:\Users\freed\Downloads\yolo11_suspicious_activity-main\yolo11_suspicious_activity-main\images'
+    pa = r'D:\activity_surveillance\dataset_path\Full_frame_images\Suspecious'
     image_path = f'{pa}\img_{i}.jpg'
     cv2.imwrite(image_path, frame)
 
@@ -71,7 +80,7 @@ cv2.destroyAllWindows()
 df = pd.DataFrame(all_data)
 
 # Path to your CSV file
-csv_file_path = r'C:\Users\freed\Downloads\yolo11_suspicious_activity-main\yolo11_suspicious_activity-main\nkeypoint.csv'
+csv_file_path = r'D:\activity_surveillance\dataset_path\suspecious_keypoints.csv'
 
 # Check if the file exists to determine whether to append or create new
 if not os.path.isfile(csv_file_path):

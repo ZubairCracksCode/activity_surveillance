@@ -6,11 +6,11 @@ import xgboost as xgb
 import numpy as np
 import cvzone
 # Define the path to the video file
-video_path = "susp1.mp4"
+video_path = r"D:\activity_surveillance\Suspecious_Video\note-giving-29.mp4"
 
 def detect_shoplifting(video_path):
     # Load YOLOv8 model (replace with the actual path to your YOLOv8 model)
-    model_yolo = YOLO('yolo11s-pose.pt')
+    model_yolo = YOLO('yolo11x-pose.pt')
 
     # Load the trained XGBoost model (replace with the actual path to your XGBoost model)
     model = xgb.Booster()
@@ -110,3 +110,4 @@ def detect_shoplifting(video_path):
 
 # Call the function with the video path
 detect_shoplifting(video_path)
+
